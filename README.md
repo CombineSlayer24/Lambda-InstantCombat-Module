@@ -1,13 +1,17 @@
 # Lambda-InstantCombat-Module
-A module for LambdaPlayers that ports over Attack On Sight from Lambda Team Module. You don't need to have Fighter, or have Combat chance set to 100.
+A module for LambdaPlayers and ports over the "Attack On Sight" feature from the Lambda Team Module, and expands upon it. With this module, you don't need to have the personality set to "Fighter" or have Combat chance set to 100.
 
+## New Convars
+The following are the new Convars that come with this module:
 
-### 3 New Convars
-- lambdaplayers_combat_attackothers
-  - If Lambda Players should immediately start attacking anything at their sight.
-  
-- lambdaplayers_combat_huntdownothers
-  - If Lambda Players should hunt down other Lambdas. 'Attack On Sight' option needs to be enabled for it to work.
+1. `lambdaplayers_combat_attackothers`: This determines whether LambdaPlayers should immediately start attacking anything at their sight.
 
-- lambdaplayers_combat_defendmyself
-  - If the Lambda Player being attacked should go after the attacker.
+2. `lambdaplayers_combat_huntdownothers`: This determines whether LambdaPlayers should hunt down other Lambdas.
+
+3. `lambdaplayers_combat_defendmyself`: This determines whether the LambdaPlayer being attacked should go after the attacker.
+
+4. `lambdaplayers_combat_attackothersonmove`: This determines whether LambdaPlayers should immediately start attacking anything when moving. 
+
+5. `lambdaplayers_combat_defendmyselfchance`: This is the chance for a LambdaPlayer to defend themselves.
+
+Please note that in order for the "Attack Randomly When Moving" and "Search For Prey" options to function, you must have the "Attack On Sight" option enabled.
