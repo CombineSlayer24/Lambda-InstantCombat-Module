@@ -1,5 +1,5 @@
 # Lambda-InstantCombat-Module
-A module for LambdaPlayers and ports over the "Attack On Sight" feature from the Lambda Team Module, and expands upon it. With this module, you don't need to have the personality set to "Fighter" or have Combat chance set to 100.
+A module for LambdaPlayers and ports over the **"Attack On Sight"** feature from the Lambda Team Module, and expands upon it. With this module, you don't need to have the personality set to "Fighter" or have Combat chance set to 100.
 
 ## New Convars
 The following are the new Convars that come with this module:
@@ -14,4 +14,4 @@ The following are the new Convars that come with this module:
 
 5. `lambdaplayers_combat_defendmyselfchance`: This is the chance for a LambdaPlayer to defend themselves.
 
-Please note that in order for the "Attack Randomly When Moving" and "Search For Prey" options to function, you must have the "Attack On Sight" option enabled.
+Please note that in order for the **"Attack Randomly When Moving"** and **"Search For Prey"** options to function, you must have the **"Attack On Sight"** option enabled.
