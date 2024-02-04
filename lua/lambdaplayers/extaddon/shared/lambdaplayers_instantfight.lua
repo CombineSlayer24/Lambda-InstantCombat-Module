@@ -1,15 +1,15 @@
-local Rand = math.Rand
-local random = math.random
-local ents_GetAll = ents.GetAll
-local hook_Add = hook.Add
-local HUD_PRINTTALK = HUD_PRINTTALK
-local WorldSpaceCenter = WorldSpaceCenter
-local RandomPairs = RandomPairs
+local Rand 				= math.Rand
+local random 			= math.random
+local ents_GetAll 		= ents.GetAll
+local hook_Add 			= hook.Add
+local HUD_PRINTTALK 	= HUD_PRINTTALK
+local WorldSpaceCenter 	= WorldSpaceCenter
+local RandomPairs 		= RandomPairs
 local attackOthers      = 		CreateLambdaConvar( "lambdaplayers_combat_attackothers", 0, true, false, false, "If Lambda Players should immediately start attacking anything at their sight.", 0, 1, { name = "Attack On Sight", type = "Bool", category = "Combat" } )
-local attackOnMove	    = 		CreateLambdaConvar( "lambdaplayers_combat_attackothersonmove", 0, true, false, false, "If Lambda Players should immediately start attacking anything when moving?", 0, 1, { name = "Attack Randomly When Moving", type = "Bool", category = "Combat" } )
+local attackOnMove	    = 		CreateLambdaConvar( "lambdaplayers_combat_attackothersonmove", 0, true, false, false, "If Lambda Players should randomly start attacking when moving?", 0, 1, { name = "Attack Randomly When Moving", type = "Bool", category = "Combat" } )
 local huntDown          = 		CreateLambdaConvar( "lambdaplayers_combat_huntdownothers", 0, true, false, false, "If Lambda Players should hunt down other Lambdas. 'Attack On Sight' option needs to be enabled for it to work.", 0, 1, { name = "Search For Prey", type = "Bool", category = "Combat" } )
-local defendMyself      = 		CreateLambdaConvar( "lambdaplayers_combat_defendmyself", 0, true, false, false, "If the Lambda Player being attacked should go after the attacker.", 0, 1, { name = "Defend Against Attacker", type = "Bool", category = "Combat" } )
 local defendChance      = 		CreateLambdaConvar( "lambdaplayers_combat_defendmyselfchance", 65, true, false, false, "Chance for Lambda Player to defend themselves.", 0, 100, { decimals = 0, name = "Defend Chance", type = "Slider", category = "Combat" } )
+local alwaysAttack      = 		CreateLambdaConvar( "lambdaplayers_combat_alwaysattack", 0, true, false, false, "If Lambda Players should always attack?", 0, 1, { decimals = 0, name = "Always Attack", type = "Slider", category = "Combat" } )
 
 if ( SERVER ) then
 
@@ -72,30 +72,53 @@ if ( SERVER ) then
 
 			--PrintMessage( HUD_PRINTTALK, selfName .. ": I'm attacking " .. targetName )
 	
-			if defendMyself:GetBool() then
+			if random( 100 ) <= defendChance:GetInt() then
 				DefendMyself( ent, self )
 			end
 	
 			return ( self:IsInRange( ent, 2000 ) )
 		end)
-	
+
 		if #surroundings > 0 then
-			self:AttackTarget( surroundings[ random( #surroundings ) ] )
-			self:PlaySoundFile( "taunt" )
+			if random( 100 ) <= 60 then
+				self:AttackTarget( surroundings[ random( #surroundings ) ] )
+				self:PlaySoundFile( "taunt" )
+				--PrintMessage( HUD_PRINTTALK, self:GetLambdaName() .. ": I'm attacking someone random" )
+			else
+				local closestDist = math.huge
+				local closestTarget = nil
+				for _, ent in ipairs( surroundings ) do
+					local dist = myPos:DistToSqr( ent:WorldSpaceCenter() )
+					if dist < closestDist then
+						closestDist = dist
+						closestTarget = ent
+					end
+				end
+				if closestTarget then
+					self:AttackTarget(closestTarget)
+				end
+
+				self:PlaySoundFile( "taunt" )
+
+				--PrintMessage( HUD_PRINTTALK, self:GetLambdaName() .. ": I'm attacking someone close to me" )
+			end
 		end
 	end
 
 	local function LambdaOnThink( self, wepent, isdead )
 		if isdead then return end
-
+	
 		if CurTime() > self.l_NextEnemySearchT then
 			self.l_NextEnemySearchT = CurTime() + Rand( 0.33, 1.0 )
-
-			if attackOthers:GetBool() and !self:InCombat() then
+	
+			local notInCombat = !self:InCombat()
+			if alwaysAttack:GetBool() and notInCombat then
+				AttackVictim( self, false, false )
+			elseif attackOthers:GetBool() and notInCombat then
 				AttackVictim( self, true )
 			end
 		end
-	end
+	end	
 
 	local function LambdaOnBeginMove( self, pos, onNavmesh )
 		local state = self:GetState()
@@ -109,6 +132,7 @@ if ( SERVER ) then
 				if huntDown:GetBool() and attackOthers:GetBool() then
 					for _, ent in RandomPairs( ents_GetAll() ) do
 						if ent != self and self:CanTarget( ent ) then -- Let's find someone
+							self:SetState( "FindTarget" )
 
 							local targetName = getEntityName( ent )
 
@@ -116,7 +140,7 @@ if ( SERVER ) then
 							self:SetRun( random( 3 ) == 1 )
 							self:RecomputePath( rndPos )
 
-							--PrintMessage( HUD_PRINTTALK, self:GetLambdaName() .. ": I'm looking to hurt " .. targetName )
+							PrintMessage( HUD_PRINTTALK, self:GetLambdaName() .. ": I'm hunting for " .. targetName )
 
 							self:PlaySoundFile( "witness" )
 							return
